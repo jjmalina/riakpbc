@@ -13,6 +13,7 @@ var _ = proto.Marshal
 var _ = &json.SyntaxError{}
 var _ = math.Inf
 
+// Used by riak_repl bucket fixup
 type RpbBucketProps_RpbReplMode int32
 
 const (
@@ -43,9 +44,6 @@ func (x RpbBucketProps_RpbReplMode) Enum() *RpbBucketProps_RpbReplMode {
 func (x RpbBucketProps_RpbReplMode) String() string {
 	return proto.EnumName(RpbBucketProps_RpbReplMode_name, int32(x))
 }
-func (x RpbBucketProps_RpbReplMode) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.String())
-}
 func (x *RpbBucketProps_RpbReplMode) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(RpbBucketProps_RpbReplMode_value, data, "RpbBucketProps_RpbReplMode")
 	if err != nil {
@@ -55,6 +53,7 @@ func (x *RpbBucketProps_RpbReplMode) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// Error response - may be generated for any Req
 type RpbErrorResp struct {
 	Errmsg           []byte  `protobuf:"bytes,1,req,name=errmsg" json:"errmsg,omitempty"`
 	Errcode          *uint32 `protobuf:"varint,2,req,name=errcode" json:"errcode,omitempty"`
@@ -79,6 +78,7 @@ func (m *RpbErrorResp) GetErrcode() uint32 {
 	return 0
 }
 
+// Get server info request - no message defined, just send RpbGetServerInfoReq message code
 type RpbGetServerInfoResp struct {
 	Node             []byte `protobuf:"bytes,1,opt,name=node" json:"node,omitempty"`
 	ServerVersion    []byte `protobuf:"bytes,2,opt,name=server_version" json:"server_version,omitempty"`
@@ -103,6 +103,7 @@ func (m *RpbGetServerInfoResp) GetServerVersion() []byte {
 	return nil
 }
 
+// Key/value pair - used for user metadata, indexes, search doc fields
 type RpbPair struct {
 	Key              []byte `protobuf:"bytes,1,req,name=key" json:"key,omitempty"`
 	Value            []byte `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
@@ -127,8 +128,10 @@ func (m *RpbPair) GetValue() []byte {
 	return nil
 }
 
+// Get bucket properties request
 type RpbGetBucketReq struct {
 	Bucket           []byte `protobuf:"bytes,1,req,name=bucket" json:"bucket,omitempty"`
+	Type             []byte `protobuf:"bytes,2,opt,name=type" json:"type,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
 }
 
@@ -143,6 +146,14 @@ func (m *RpbGetBucketReq) GetBucket() []byte {
 	return nil
 }
 
+func (m *RpbGetBucketReq) GetType() []byte {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
+
+// Get bucket properties response
 type RpbGetBucketResp struct {
 	Props            *RpbBucketProps `protobuf:"bytes,1,req,name=props" json:"props,omitempty"`
 	XXX_unrecognized []byte          `json:"-"`
@@ -159,9 +170,11 @@ func (m *RpbGetBucketResp) GetProps() *RpbBucketProps {
 	return nil
 }
 
+// Set bucket properties request
 type RpbSetBucketReq struct {
 	Bucket           []byte          `protobuf:"bytes,1,req,name=bucket" json:"bucket,omitempty"`
 	Props            *RpbBucketProps `protobuf:"bytes,2,req,name=props" json:"props,omitempty"`
+	Type             []byte          `protobuf:"bytes,3,opt,name=type" json:"type,omitempty"`
 	XXX_unrecognized []byte          `json:"-"`
 }
 
@@ -183,8 +196,17 @@ func (m *RpbSetBucketReq) GetProps() *RpbBucketProps {
 	return nil
 }
 
+func (m *RpbSetBucketReq) GetType() []byte {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
+
+// Reset bucket properties request
 type RpbResetBucketReq struct {
 	Bucket           []byte `protobuf:"bytes,1,req,name=bucket" json:"bucket,omitempty"`
+	Type             []byte `protobuf:"bytes,2,opt,name=type" json:"type,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
 }
 
@@ -199,6 +221,74 @@ func (m *RpbResetBucketReq) GetBucket() []byte {
 	return nil
 }
 
+func (m *RpbResetBucketReq) GetType() []byte {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
+
+// Get bucket properties request
+type RpbGetBucketTypeReq struct {
+	Type             []byte `protobuf:"bytes,1,req,name=type" json:"type,omitempty"`
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *RpbGetBucketTypeReq) Reset()         { *m = RpbGetBucketTypeReq{} }
+func (m *RpbGetBucketTypeReq) String() string { return proto.CompactTextString(m) }
+func (*RpbGetBucketTypeReq) ProtoMessage()    {}
+
+func (m *RpbGetBucketTypeReq) GetType() []byte {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
+
+// Set bucket properties request
+type RpbSetBucketTypeReq struct {
+	Type             []byte          `protobuf:"bytes,1,req,name=type" json:"type,omitempty"`
+	Props            *RpbBucketProps `protobuf:"bytes,2,req,name=props" json:"props,omitempty"`
+	XXX_unrecognized []byte          `json:"-"`
+}
+
+func (m *RpbSetBucketTypeReq) Reset()         { *m = RpbSetBucketTypeReq{} }
+func (m *RpbSetBucketTypeReq) String() string { return proto.CompactTextString(m) }
+func (*RpbSetBucketTypeReq) ProtoMessage()    {}
+
+func (m *RpbSetBucketTypeReq) GetType() []byte {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
+
+func (m *RpbSetBucketTypeReq) GetProps() *RpbBucketProps {
+	if m != nil {
+		return m.Props
+	}
+	return nil
+}
+
+// Reset bucket properties request
+type RpbResetBucketTypeReq struct {
+	Type             []byte `protobuf:"bytes,1,req,name=type" json:"type,omitempty"`
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *RpbResetBucketTypeReq) Reset()         { *m = RpbResetBucketTypeReq{} }
+func (m *RpbResetBucketTypeReq) String() string { return proto.CompactTextString(m) }
+func (*RpbResetBucketTypeReq) ProtoMessage()    {}
+
+func (m *RpbResetBucketTypeReq) GetType() []byte {
+	if m != nil {
+		return m.Type
+	}
+	return nil
+}
+
+// Module-Function pairs for commit hooks and other bucket properties
+// that take functions
 type RpbModFun struct {
 	Module           []byte `protobuf:"bytes,1,req,name=module" json:"module,omitempty"`
 	Function         []byte `protobuf:"bytes,2,req,name=function" json:"function,omitempty"`
@@ -223,6 +313,8 @@ func (m *RpbModFun) GetFunction() []byte {
 	return nil
 }
 
+// A commit hook, which may either be a modfun or a JavaScript named
+// function
 type RpbCommitHook struct {
 	Modfun           *RpbModFun `protobuf:"bytes,1,opt,name=modfun" json:"modfun,omitempty"`
 	Name             []byte     `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
@@ -247,31 +339,37 @@ func (m *RpbCommitHook) GetName() []byte {
 	return nil
 }
 
+// Bucket properties
 type RpbBucketProps struct {
-	NVal             *uint32                     `protobuf:"varint,1,opt,name=n_val" json:"n_val,omitempty"`
-	AllowMult        *bool                       `protobuf:"varint,2,opt,name=allow_mult" json:"allow_mult,omitempty"`
-	LastWriteWins    *bool                       `protobuf:"varint,3,opt,name=last_write_wins" json:"last_write_wins,omitempty"`
-	Precommit        []*RpbCommitHook            `protobuf:"bytes,4,rep,name=precommit" json:"precommit,omitempty"`
-	HasPrecommit     *bool                       `protobuf:"varint,5,opt,name=has_precommit,def=0" json:"has_precommit,omitempty"`
-	Postcommit       []*RpbCommitHook            `protobuf:"bytes,6,rep,name=postcommit" json:"postcommit,omitempty"`
-	HasPostcommit    *bool                       `protobuf:"varint,7,opt,name=has_postcommit,def=0" json:"has_postcommit,omitempty"`
-	ChashKeyfun      *RpbModFun                  `protobuf:"bytes,8,opt,name=chash_keyfun" json:"chash_keyfun,omitempty"`
-	Linkfun          *RpbModFun                  `protobuf:"bytes,9,opt,name=linkfun" json:"linkfun,omitempty"`
-	OldVclock        *uint32                     `protobuf:"varint,10,opt,name=old_vclock" json:"old_vclock,omitempty"`
-	YoungVclock      *uint32                     `protobuf:"varint,11,opt,name=young_vclock" json:"young_vclock,omitempty"`
-	BigVclock        *uint32                     `protobuf:"varint,12,opt,name=big_vclock" json:"big_vclock,omitempty"`
-	SmallVclock      *uint32                     `protobuf:"varint,13,opt,name=small_vclock" json:"small_vclock,omitempty"`
-	Pr               *uint32                     `protobuf:"varint,14,opt,name=pr" json:"pr,omitempty"`
-	R                *uint32                     `protobuf:"varint,15,opt,name=r" json:"r,omitempty"`
-	W                *uint32                     `protobuf:"varint,16,opt,name=w" json:"w,omitempty"`
-	Pw               *uint32                     `protobuf:"varint,17,opt,name=pw" json:"pw,omitempty"`
-	Dw               *uint32                     `protobuf:"varint,18,opt,name=dw" json:"dw,omitempty"`
-	Rw               *uint32                     `protobuf:"varint,19,opt,name=rw" json:"rw,omitempty"`
-	BasicQuorum      *bool                       `protobuf:"varint,20,opt,name=basic_quorum" json:"basic_quorum,omitempty"`
-	NotfoundOk       *bool                       `protobuf:"varint,21,opt,name=notfound_ok" json:"notfound_ok,omitempty"`
-	Backend          []byte                      `protobuf:"bytes,22,opt,name=backend" json:"backend,omitempty"`
+	// Declared in riak_core_app
+	NVal          *uint32          `protobuf:"varint,1,opt,name=n_val" json:"n_val,omitempty"`
+	AllowMult     *bool            `protobuf:"varint,2,opt,name=allow_mult" json:"allow_mult,omitempty"`
+	LastWriteWins *bool            `protobuf:"varint,3,opt,name=last_write_wins" json:"last_write_wins,omitempty"`
+	Precommit     []*RpbCommitHook `protobuf:"bytes,4,rep,name=precommit" json:"precommit,omitempty"`
+	HasPrecommit  *bool            `protobuf:"varint,5,opt,name=has_precommit,def=0" json:"has_precommit,omitempty"`
+	Postcommit    []*RpbCommitHook `protobuf:"bytes,6,rep,name=postcommit" json:"postcommit,omitempty"`
+	HasPostcommit *bool            `protobuf:"varint,7,opt,name=has_postcommit,def=0" json:"has_postcommit,omitempty"`
+	ChashKeyfun   *RpbModFun       `protobuf:"bytes,8,opt,name=chash_keyfun" json:"chash_keyfun,omitempty"`
+	// Declared in riak_kv_app
+	Linkfun     *RpbModFun `protobuf:"bytes,9,opt,name=linkfun" json:"linkfun,omitempty"`
+	OldVclock   *uint32    `protobuf:"varint,10,opt,name=old_vclock" json:"old_vclock,omitempty"`
+	YoungVclock *uint32    `protobuf:"varint,11,opt,name=young_vclock" json:"young_vclock,omitempty"`
+	BigVclock   *uint32    `protobuf:"varint,12,opt,name=big_vclock" json:"big_vclock,omitempty"`
+	SmallVclock *uint32    `protobuf:"varint,13,opt,name=small_vclock" json:"small_vclock,omitempty"`
+	Pr          *uint32    `protobuf:"varint,14,opt,name=pr" json:"pr,omitempty"`
+	R           *uint32    `protobuf:"varint,15,opt,name=r" json:"r,omitempty"`
+	W           *uint32    `protobuf:"varint,16,opt,name=w" json:"w,omitempty"`
+	Pw          *uint32    `protobuf:"varint,17,opt,name=pw" json:"pw,omitempty"`
+	Dw          *uint32    `protobuf:"varint,18,opt,name=dw" json:"dw,omitempty"`
+	Rw          *uint32    `protobuf:"varint,19,opt,name=rw" json:"rw,omitempty"`
+	BasicQuorum *bool      `protobuf:"varint,20,opt,name=basic_quorum" json:"basic_quorum,omitempty"`
+	NotfoundOk  *bool      `protobuf:"varint,21,opt,name=notfound_ok" json:"notfound_ok,omitempty"`
+	// Used by riak_kv_multi_backend
+	Backend []byte `protobuf:"bytes,22,opt,name=backend" json:"backend,omitempty"`
+	// Used by riak_search bucket fixup
 	Search           *bool                       `protobuf:"varint,23,opt,name=search" json:"search,omitempty"`
 	Repl             *RpbBucketProps_RpbReplMode `protobuf:"varint,24,opt,name=repl,enum=RpbBucketProps_RpbReplMode" json:"repl,omitempty"`
+	SearchIndex      []byte                      `protobuf:"bytes,25,opt,name=search_index" json:"search_index,omitempty"`
 	XXX_unrecognized []byte                      `json:"-"`
 }
 
@@ -447,7 +545,39 @@ func (m *RpbBucketProps) GetRepl() RpbBucketProps_RpbReplMode {
 	if m != nil && m.Repl != nil {
 		return *m.Repl
 	}
-	return 0
+	return RpbBucketProps_FALSE
+}
+
+func (m *RpbBucketProps) GetSearchIndex() []byte {
+	if m != nil {
+		return m.SearchIndex
+	}
+	return nil
+}
+
+// Authentication request
+type RpbAuthReq struct {
+	User             []byte `protobuf:"bytes,1,req,name=user" json:"user,omitempty"`
+	Password         []byte `protobuf:"bytes,2,req,name=password" json:"password,omitempty"`
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *RpbAuthReq) Reset()         { *m = RpbAuthReq{} }
+func (m *RpbAuthReq) String() string { return proto.CompactTextString(m) }
+func (*RpbAuthReq) ProtoMessage()    {}
+
+func (m *RpbAuthReq) GetUser() []byte {
+	if m != nil {
+		return m.User
+	}
+	return nil
+}
+
+func (m *RpbAuthReq) GetPassword() []byte {
+	if m != nil {
+		return m.Password
+	}
+	return nil
 }
 
 func init() {
